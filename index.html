@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voiceflow Chatbot with Multiple Extensions and Custom Forms</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script> <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+</head>
+<body>
+    <h1>Voiceflow Chatbot with Multiple Extensions and Custom Forms</h1>
+
+    <script>
+      // Global flag to track if the disclaimer has been shown
+      let disclaimerShown = false; // Global flag to track if the disclaimer has been shown
+
+      const RemoveDisclaimerExtension = {
+          name: 'removeDisclaimer',
+          type: 'response',
+          match: ({ trace }) => {
+              // Ensure this extension is triggered only on the "removeDisclaimer" step
+              return trace.payload && trace.payload.name === 'removeDisclaimer';
+          },
+          render: ({ trace, element }) => {
+              // Check if the disclaimer has already been handled
+              if (trace.payload && trace.payload.shown) {
+                  console.log('Disclaimer already handled.');
+                  return;
+              }
+
+              // Create the disclaimer container
+              const disclaimerContainer = document.createElement('div');
+              disclaimerContainer.style.display = 'flex';
+              disclaimerContainer.style.flexDirection = 'column';
+              disclaimerContainer.style.alignItems = 'center';
+              disclaimerContainer.style.margin = '10px 0';
+              disclaimerContainer.style.padding = '10px';
+              disclaimerContainer.style.backgroundColor = '#f9f9f9';
+              disclaimerContainer.style.borderRadius = '8px';
+              disclaimerContainer.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+              disclaimerContainer.style.textAlign = 'center';
+
+              // Add the disclaimer text
+              const disclaimerText = document.createElement('p');
+              disclaimerText.textContent =
+                  'Disclaimer: Please note that all information and recommendations regarding specific platforms and tools are based on our own experience. For the most accurate and up-to-date information, we recommend contacting the platforms directly or visiting their websites.';
+              disclaimerText.style.marginBottom = '10px';
+              disclaimerText.style.fontSize = '14px';
+              disclaimerText.style.color = '#333';
+
+              // Create the button for accepting the disclaimer
+              const agreeButton = document.createElement('button');
+              agreeButton.textContent = 'Agree';
+              agreeButton.style.padding = '10px 20px';
+              agreeButton.style.border = 'none';
+              agreeButton.style.backgroundColor = '#4CAF50';
+              agreeButton.style.color = 'white';
+              agreeButton.style.borderRadius = '5px';
+              agreeButton.style.cursor = 'pointer';
+
+              // Attach click event to the button
+              agreeButton.addEventListener('click', () => {
+                  // Remove the disclaimer container
+                  disclaimerContainer.remove();
+
+                  // Trigger the Voiceflow bot to move to the next step
+                  window.voiceflow.chat.interact({
+                      type: 'text',
+                      payload: { message: 'Agree to Disclaimer' },
+                  });
+
+                  console.log('Disclaimer accepted and bot advanced.');
+              });
+
+              // Append the text and button to the container
+              disclaimerContainer.appendChild(disclaimerText);
+              disclaimerContainer.appendChild(agreeButton);
+
+              // Append the container to the chatbot UI
+              element.appendChild(disclaimerContainer);
+          },
+      };
+
+
+
+    </script>
+    
+
+   
+    <script>
+        const generateTableExtension = {
+    name: "generate_table",
+    type: "response",
+    match: ({ trace }) => trace.payload && trace.payload.name === "generate_table",
+    render: ({ trace, element }) => {
+        try {
+            const { jsPDF } = window.jspdf;
+
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageHeight = doc.internal.pageSize.height; // A4 page height in mm
+
+            // Inquiry Number as a Variable
+            const inquiryNumber = "234324324";
+
+            // =================== HEADER ===================
+            doc.setFillColor(32, 44, 64);
+            doc.rect(0, 0, 210, 30, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(255, 255, 255);
+            doc.text("Service Transformation GmbH", 105, 15, { align: "center" });
+            doc.setFontSize(10);
+            doc.setTextColor(200, 200, 200);
+            doc.text("Schumannstr. 17 | 10117 Berlin", 105, 22, { align: "center" });
+
+            let y = 35; // Starting Y position for tables
+            const margin = 15;
+
+            // =================== TABLE TITLES AND TABLES ===================
+            // First Table: "Types of Tools"
+            doc.setFont("times", "bold");
+            doc.setFontSize(14);
+            doc.text("Types of Tools", margin, y);
+
+            doc.autoTable({
+                startY: y + 5,
+                head: [['Criteria', 'AI Libraries', 'Agent Frameworks', 'Chatflow Designers']],
+                body: [
+                    ['Scalability', 'Very High', 'High', 'Medium'],
+                    ['Drag and Drop Platform', 'No', 'Yes', 'Yes'],
+                    ['Customizability', 'Very High', 'High', 'Moderate'],
+                    ['Code Knowledge Needed', 'Yes', 'Low', 'No'],
+                    ['Speed of Implementation', 'Low', 'High', 'Very High'],
+                    ['Documentation & Online Help', 'Extensive', 'Good', 'Varied']
+                ],
+                theme: "grid",
+                headStyles: { fillColor: [32, 44, 64], textColor: 255 },
+            });
+
+            // Second Table: "Tools"
+            if (doc.lastAutoTable.finalY + 10 > pageHeight - 20) {
+                doc.addPage();
+                y = 15;
+            }
+            doc.setFont("times", "bold");
+            doc.text("Tools", margin, doc.lastAutoTable.finalY + 10);
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 15,
+                head: [['Criteria', 'LangChain', 'CrewAI', 'LangFlow', 'Flowise', 'n8n', 'Voiceflow', 'Dante', 'ChatSonic']],
+                body: [
+                    ['Multiple Language Support', 'High', 'High', 'Medium', 'Medium', 'Basic', 'Medium', 'Basic', 'Medium'],
+                    ['Scalability', 'High', 'High', 'Medium', 'Medium', 'Medium', 'Medium', 'Low to Medium', 'Medium'],
+                    ['Customizability', 'Very High', 'High', 'Moderate', 'Moderate', 'High', 'Moderate', 'Low', 'Moderate'],
+                    ['Code Knowledge Needed', 'High', 'High', 'Minimal', 'Minimal', 'Minimal', 'Low', 'None', 'Minimal'],
+                    ['Speed of Implementation', 'Low', 'Moderate', 'High', 'High', 'High', 'Very High', 'Very High', 'Very High'],
+                    ['API Integration', 'High', 'High', 'Moderate', 'Moderate', 'High', 'Moderate', 'Basic', 'Moderate'],
+                ],
+                theme: "grid",
+                headStyles: { fillColor: [32, 44, 64], textColor: 255 },
+            });
+
+            // =================== FOOTER ===================
+            doc.setFillColor(32, 44, 64);
+            doc.rect(0, pageHeight - 20, 210, 20, "F");
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+
+            // Footer Texts
+            doc.text("Contact Us: +49 (0)30 62850004", 105, pageHeight - 15, { align: "center" });
+
+            // Add Email Link with Pre-Written Subject
+            const emailSubject = `Inquiry about the Service transformation recommendation: ${inquiryNumber}`;
+            doc.textWithLink(
+                "Email Us: info@service-transformation.de",
+                105,
+                pageHeight - 10,
+                {
+                    align: "center",
+                    url: `mailto:info@service-transformation.de?subject=${encodeURIComponent(emailSubject)}`
+                }
+            );
+
+            // Add Website Link
+            doc.textWithLink(
+                "Visit our website: www.service-transformation.de",
+                105,
+                pageHeight - 5,
+                {
+                    align: "center",
+                    url: "https://www.service-transformation.de/de"
+                }
+            );
+
+            // =================== DOWNLOAD LINK ===================
+            const downloadLink = document.createElement("a");
+            downloadLink.textContent = "Download Generated PDF";
+            downloadLink.style.display = "inline-block";
+            downloadLink.style.marginTop = "10px";
+            downloadLink.style.padding = "8px 12px";
+            downloadLink.style.color = "#ffffff";
+            downloadLink.style.backgroundColor = "#4CAF50";
+            downloadLink.style.borderRadius = "5px";
+            downloadLink.style.textDecoration = "none";
+
+            downloadLink.href = doc.output("bloburl");
+            downloadLink.download = "Tools_Tables.pdf";
+            element.appendChild(downloadLink);
+        } catch (error) {
+            console.error("An error occurred in the generateTableExtension:", error);
+        }
+    },
+};
+
+    </script>
+
+
+
+
+    <script>
+
+const pdfCreatorExtension = {
+    name: "pdfcreator",
+    type: "response",
+    match: ({ trace }) => trace.payload && trace.payload.name === "pdf",
+    render: ({ trace, element }) => {
+        try {
+            const { jsPDF } = window.jspdf;
+
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageHeight = doc.internal.pageSize.height; // A4 page height in mm
+
+            // Inquiry Number as a Variable
+            const inquiryNumber = "234324324";
+
+            // =================== HEADER ===================
+            doc.setFillColor(32, 44, 64);
+            doc.rect(0, 0, 210, 30, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(255, 255, 255);
+            doc.text("Service Transformation GmbH", 105, 15, { align: "center" });
+            doc.setFontSize(10);
+            doc.setTextColor(200, 200, 200);
+            doc.text("Schumannstr. 17 | 10117 Berlin", 105, 22, { align: "center" });
+
+            // =================== MAIN TEXT AND TITLES ===================
+            doc.setFont("times", "normal");
+            doc.setFontSize(12);
+            doc.setTextColor(32, 44, 64);
+
+            const prefilledText = `Detailed Recommendation
+Solution Type:
+Based on your requirements to assist employees without direct interaction, automate repetitive tasks, make decisions and implement solutions, and generate human-like responses, answer questions using specific company knowledge, learn and update from custom knowledge sources, and summarize text or information, we recommend:
+
+Complex Agent: This is ideal for multi-LLM workflows, advanced decision-making tasks, or integration across tools and platforms. It will handle the complexity and specificity of your tasks effectively.
+
+Security Recommendation:
+Given your security expectation that data must be encrypted before sending to external servers, we recommend:
+
+On-Premise/Private Cloud: This will ensure that your data remains highly secure and within your control, adhering to strict data security standards.
+
+Tool Recommendation:
+Based on your needs and the required capabilities, we suggest the following tools:
+
+LangChain: Ideal for businesses requiring high customizability and in-house technical expertise. It supports complex workflows and extensive API integrations, making it suitable for your needs.
+
+Crewai: Offers flexible integration with some technical support available. It is highly customizable and scalable for complex applications, which aligns well with your requirements.
+
+LangFlow/Flowise: For quick deployment using low-code, drag-and-drop platforms. These tools will enable you to set up and deploy solutions rapidly, which is crucial given your timeline.
+
+Voiceflow/Dante: For intuitive conversational bots with minimal coding requirements. These tools are excellent for creating user-friendly interfaces and handling conversational tasks efficiently.
+
+n8n: For workflow automation with strong API support but minimal LLM dependency. It is versatile for building workflows and requires low coding skills for basic automation.
+
+Timeline-Based Recommendations:
+Given your expected timeline of 1 to 3 months, we recommend:
+
+Pre-Built Solutions or Low-Code Platforms: To ensure rapid deployment, tools like LangFlow, Flowise, Voiceflow, and Dante are ideal. They offer quick setup and deployment with minimal coding, ensuring you meet your timeline.
+
+Implementation Approach:
+Since you prefer the implementation to be handled entirely by someone else, we suggest:
+
+Full-Service Support: We will provide end-to-end implementation, including process analysis, tool selection, integration, QA, and optimization. This approach ensures that you get a comprehensive solution without needing to manage the technical details yourself.
+
+Service Transformation Approach:
+We offer a complete range of services to ensure successful chatbot implementation:
+
+Business Process Analysis: We will evaluate your business processes to identify areas where chatbots can create the most impact, highlight bottlenecks, and uncover opportunities for improvement.
+
+Identifying the Right Chatbot Tools: We will recommend the most suitable chatbot solution based on your specific needs, ensuring it fits seamlessly into your business ecosystem.
+
+Implementation and Integration: We will design chatbot workflows, integrate the chatbot with your existing systems, and ensure smooth deployment with minimal disruption.
+
+Quality Assurance (QA) Processes: We will establish testing protocols, conduct regular audits, and monitor performance to maintain high standards.
+
+Reporting and Continuous Optimization: We will analyze chatbot interactions, generate performance reports, and continuously refine workflows to keep your chatbot effective and aligned with your business objectives.
+
+Final Recommendation Summary:
+To meet your needs efficiently and securely within the given timeline, we recommend implementing a complex agent using tools like LangChain or Crewai for high customizability and integration capabilities. For rapid deployment, consider LangFlow, Flowise, Voiceflow, or Dante. We will handle the entire implementation process, ensuring a seamless and effective solution tailored to your business.
+
+Let us help you harness the power of chatbots to transform your business processes and achieve measurable results. Reach out to us today to get started!`;
+
+            let y = 35;
+            const lineHeight = 7;
+            const margin = 15;
+            const maxWidth = 180;
+
+            const textLines = prefilledText.split('\n');
+            textLines.forEach(line => {
+                if (line.trim().endsWith(':')) {
+                    // Bold titles
+                    doc.setFont("times", "bold");
+                    const boldTitle = doc.splitTextToSize(line, maxWidth);
+                    boldTitle.forEach(wrapLine => {
+                        if (y + lineHeight > pageHeight - 20) {
+                            doc.addPage();
+                            y = 15;
+                        }
+                        doc.text(wrapLine, margin, y);
+                        y += lineHeight;
+                    });
+                    doc.setFont("times", "normal");
+                } else {
+                    // Regular text
+                    const wrappedText = doc.splitTextToSize(line, maxWidth);
+                    wrappedText.forEach(wrapLine => {
+                        if (y + lineHeight > pageHeight - 20) {
+                            doc.addPage();
+                            y = 15;
+                        }
+                        doc.text(wrapLine, margin, y);
+                        y += lineHeight;
+                    });
+                }
+            });
+
+            // =================== TABLE TITLES AND TABLES ===================
+            // First Table: "Types of Tools"
+            if (y + 10 > pageHeight - 20) {
+                doc.addPage();
+                y = 15;
+            }
+            doc.setFont("times", "bold");
+            doc.setFontSize(14);
+            doc.text("Types of Tools", margin, y + 10);
+
+            doc.autoTable({
+                startY: y + 15,
+                head: [['Criteria', 'AI Libraries', 'Agent Frameworks', 'Chatflow Designers']],
+                body: [
+                    ['Scalability', 'Very High', 'High', 'Medium'],
+                    ['Drag and Drop Platform', 'No', 'Yes', 'Yes'],
+                    ['Customizability', 'Very High', 'High', 'Moderate'],
+                    ['Code Knowledge Needed', 'Yes', 'Low', 'No'],
+                    ['Speed of Implementation', 'Low', 'High', 'Very High'],
+                    ['Documentation & Online Help', 'Extensive', 'Good', 'Varied']
+                ],
+                theme: "grid",
+                headStyles: { fillColor: [32, 44, 64], textColor: 255 },
+            });
+
+            // Second Table: "Tools"
+            if (doc.lastAutoTable.finalY + 10 > pageHeight - 20) {
+                doc.addPage();
+            }
+            doc.setFont("times", "bold");
+            doc.text("Tools", margin, doc.lastAutoTable.finalY + 10);
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 15,
+                head: [['Criteria', 'LangChain', 'CrewAI', 'LangFlow', 'Flowise', 'n8n', 'Voiceflow', 'Dante', 'ChatSonic']],
+                body: [
+                    ['Multiple Language Support', 'High', 'High', 'Medium', 'Medium', 'Basic', 'Medium', 'Basic', 'Medium'],
+                    ['Scalability', 'High', 'High', 'Medium', 'Medium', 'Medium', 'Medium', 'Low to Medium', 'Medium'],
+                    ['Customizability', 'Very High', 'High', 'Moderate', 'Moderate', 'High', 'Moderate', 'Low', 'Moderate'],
+                    ['Code Knowledge Needed', 'High', 'High', 'Minimal', 'Minimal', 'Minimal', 'Low', 'None', 'Minimal'],
+                    ['Speed of Implementation', 'Low', 'Moderate', 'High', 'High', 'High', 'Very High', 'Very High', 'Very High'],
+                    ['API Integration', 'High', 'High', 'Moderate', 'Moderate', 'High', 'Moderate', 'Basic', 'Moderate'],
+                ],
+                theme: "grid",
+                headStyles: { fillColor: [32, 44, 64], textColor: 255 },
+            });
+
+            // =================== FOOTER ===================
+            doc.setFillColor(32, 44, 64);
+            doc.rect(0, pageHeight - 20, 210, 20, "F");
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+
+            // Footer Texts
+            doc.text("Contact Us: +49 (0)30 62850004", 105, pageHeight - 15, { align: "center" });
+
+            // Add Email Link with Pre-Written Subject
+            const emailSubject = `Inquiry about the Service transformation recommendation: ${inquiryNumber}`;
+            doc.textWithLink(
+                "Email Us: info@service-transformation.de",
+                105,
+                pageHeight - 10,
+                {
+                    align: "center",
+                    url: `mailto:info@service-transformation.de?subject=${encodeURIComponent(emailSubject)}`
+                }
+            );
+
+            // Add Website Link
+            doc.textWithLink(
+                "Visit our website: www.service-transformation.de",
+                105,
+                pageHeight - 5,
+                {
+                    align: "center",
+                    url: "https://www.service-transformation.de/de"
+                }
+            );
+
+            // =================== DOWNLOAD LINK ===================
+            const downloadLink = document.createElement("a");
+            downloadLink.textContent = "Download Generated PDF";
+            downloadLink.style.display = "inline-block";
+            downloadLink.style.marginTop = "10px";
+            downloadLink.style.padding = "8px 12px";
+            downloadLink.style.color = "#ffffff";
+            downloadLink.style.backgroundColor = "#4CAF50";
+            downloadLink.style.borderRadius = "5px";
+            downloadLink.style.textDecoration = "none";
+
+            downloadLink.href = doc.output("bloburl");
+            downloadLink.download = "Recommendation_Report.pdf";
+            element.appendChild(downloadLink);
+        } catch (error) {
+            console.error("An error occurred in the pdfCreatorExtension:", error);
+        }
+    },
+};
+
+
+</script>
+
+
+    <!-- Free Text Toggle Extension Script -->
+    <script>
+    const freeTextToggleExtension = {
+      name: 'freeTextToggle',
+      type: 'response',
+      match: ({ trace }) =>
+        trace.payload && (trace.payload.name === 'remove_freetext' || trace.payload.name === 'add_freetext'),
+      render: ({ trace }) => {
+        function updateFreeTextInput(retries = 10) {
+          const vfWidgetContainers = document.querySelectorAll('*');
+          
+          for (let container of vfWidgetContainers) {
+            if (container.shadowRoot) {
+              const freeTextInput = container.shadowRoot.querySelector('textarea[id^="vf-chat-input"]');
+              if (freeTextInput) {
+                freeTextInput.placeholder = trace.payload.name === 'remove_freetext' ? 
+                  "Please use the buttons and don't refresh the page" : "Message…";
+                freeTextInput.readOnly = trace.payload.name === 'remove_freetext';
+                return;
+              }
+            }
+          }
+
+          if (retries > 0) {
+            setTimeout(() => updateFreeTextInput(retries - 1), 500);
+          }
+        }
+
+        updateFreeTextInput();
+      },
+    };
+    </script>
+
+<script>
+  // Custom Form Extension for custom_question1
+  const CustomFormExtension1 = {
+    name: 'CustomForm1',
+    type: 'response',
+    match: ({ trace }) => 
+      trace.type === 'custom_question1' || trace.payload.name === 'custom_question1', // Match custom step
+    render: ({ trace, element }) => {
+      const formContainer = document.createElement('form');
+
+      formContainer.innerHTML = `
+        <style>
+          form {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            width: 240px;
+            overflow-y: auto;
+          }
+          .question-block {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          }
+          label {
+            font-size: 0.99em;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+            font-weight: normal;
+          }
+          input[type="radio"], input[type="checkbox"] {
+            margin-right: 8px;
+          }
+          .submit {
+            background: linear-gradient(135deg, #2e6ee1, #2e7ff1);
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.3s;
+          }
+          .submit:hover {
+            background: linear-gradient(135deg, #2e7ff1, #2e6ee1);
+          }
+        </style>
+
+        ${generateQuestions1()}
+
+        <input type="submit" class="submit" value="Submit">
+      `;
+
+      formContainer.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(formContainer);
+        const responses = {};
+        formData.forEach((value, key) => {
+          if (responses[key]) {
+            responses[key] = [].concat(responses[key], value);
+          } else {
+            responses[key] = value;
+          }
+        });
+
+        formContainer.querySelector('.submit').remove();
+
+        window.voiceflow.chat.interact({
+          type: 'complete',
+          payload: { responses },
+        });
+      });
+
+      element.appendChild(formContainer);
+    },
+  };
+
+  // Custom Form Extension for custom_question2
+  const CustomFormExtension2 = {
+    name: 'CustomForm2',
+    type: 'response',
+    match: ({ trace }) => 
+      trace.type === 'custom_question2' || trace.payload.name === 'custom_question2', // Match custom step
+    render: ({ trace, element }) => {
+      const formContainer = document.createElement('form');
+
+      formContainer.innerHTML = `
+        <style>
+          form {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            width: 240px;
+            overflow-y: auto;
+          }
+          .question-block {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          }
+          label {
+            font-size: 0.99em;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+            font-weight: normal;
+          }
+          input[type="radio"], input[type="checkbox"] {
+            margin-right: 8px;
+          }
+          .submit {
+            background: linear-gradient(135deg, #2e6ee1, #2e7ff1);
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.3s;
+          }
+          .submit:hover {
+            background: linear-gradient(135deg, #2e7ff1, #2e6ee1);
+          }
+        </style>
+
+        ${generateQuestions2()}
+
+        <input type="submit" class="submit" value="Submit">
+      `;
+
+      formContainer.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(formContainer);
+        const responses = {};
+        formData.forEach((value, key) => {
+          if (responses[key]) {
+            responses[key] = [].concat(responses[key], value);
+          } else {
+            responses[key] = value;
+          }
+        });
+
+        formContainer.querySelector('.submit').remove();
+
+        window.voiceflow.chat.interact({
+          type: 'complete',
+          payload: { responses },
+        });
+      });
+
+      element.appendChild(formContainer);
+    },
+  };
+
+  function generateQuestions1() {
+    const questions = [
+      { text: 'Select one or multiple options', name: 'goal', options: [
+          'Communicate with end users', 
+          'Assist employees without direct interaction', 
+          'Automate repetitive tasks', 
+          'Make decisions and implement solutions',
+          'Not sure',] }
+    ];
+
+    return questions.map(q => `
+      <div class="question-block">
+        <label>${q.text}</label>
+        <div class="options">
+          ${q.options.map(option => `
+            <label>
+              <input type="checkbox" name="${q.name}" value="${option}">
+              ${option}
+            </label><br>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function generateQuestions2() {
+    const questions = [
+      { text: 'Select one or multiple options', name: 'capabilities', options: [
+          'Understand human language', 
+          'Generate human-like responses', 
+          'Answer questions using specific company knowledge', 
+          'Learn and update from custom knowledge sources, structured and unstructured(databases, spreadsheets, chat history)', 
+          'Summarize text or information', 
+          'Recommend solutions or actions', 
+          'Generate new content', 
+          'Initiate actions (place orders, schedule appointments, process payments, send emails etc.)', 
+          'Automate simple repetitive straightforward processes that don’t require advanced thinking and decision making',
+          'Not sure'] }
+    ];
+
+    return questions.map(q => `
+      <div class="question-block">
+        <label>${q.text}</label>
+        <div class="options">
+          ${q.options.map(option => `
+            <label>
+              <input type="checkbox" name="${q.name}" value="${option}">
+              ${option}
+            </label><br>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+  </script>
+
+
+
+    <!-- Voiceflow Chat Widget Script with All Extensions -->
+    <script type="text/javascript">
+      (function(d, t) {
+          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+          v.onload = function() {
+            window.voiceflow.chat.load({
+              verify: { projectID: '675dd693768af851b6291fd6' },
+              url: 'https://general-runtime.voiceflow.com',
+              versionID: 'production',
+              allowDangerousHTML: true, /* Enable dangerous HTML elements */
+              assistant: {
+                extensions: [
+                  pdfCreatorExtension, freeTextToggleExtension, 
+                  CustomFormExtension1, CustomFormExtension2, RemoveDisclaimerExtension, generateTableExtension
+                ],
+                stylesheet: 'test.css' // Reference your custom CSS file here               
+              }
+            }).then(() => {
+          window.voiceflow.chat.proactive.clear(); // clear all previous messages
+          window.voiceflow.chat.proactive.push({ 
+            type: 'text', 
+            payload: { message: 'Want to implement AI in your Business?' }
+          }, { 
+            type: 'text', 
+            payload: { message: 'Click on the chat to learn more!' }
+          });
+        });;
+          };
+          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; 
+          v.type = "text/javascript"; 
+          s.parentNode.insertBefore(v, s);
+      })(document, 'script');
+    </script>
+</body>
+</html>
