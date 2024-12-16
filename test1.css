@@ -1,0 +1,27 @@
+/* Custom styles for the Voiceflow widget */
+div.vfrc-widget--chat {
+    width: 800px !important; /* Set custom width for desktop */
+    max-width: none !important; /* Remove width restrictions */
+    margin: 0 24px !important; /* Add 24px side spacing */
+    position: fixed; /* Ensure it's properly positioned */
+    bottom: 24px !important; /* Spacing from the bottom */
+    right: 24px !important; /* Spacing from the right */
+}
+
+/* Responsive styles for smartphones */
+@media screen and (max-width: 768px) {
+    div.vfrc-widget--chat {
+        width: 100% !important; /* Full width on smartphones */
+        height: 100% !important; /* Full height on smartphones */
+        margin: 0 !important; /* Remove side margins */
+        top: 0 !important; /* Position at the top */
+        left: 0 !important; /* Position at the left */
+        right: 0 !important; /* Ensure it's fully visible */
+        bottom: 0 !important; /* Ensure it's fully visible */
+    }
+}
+
+/* Hide empty chat bubbles */
+.vfrc-message:empty {
+    display: none !important;
+}
