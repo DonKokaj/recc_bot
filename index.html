@@ -87,6 +87,82 @@
     </script>
     
 
+    <script>
+      // Global flag to track if the disclaimer has been shown
+      let disclaimerShown_german = false; // Global flag to track if the disclaimer has been shown
+
+      const RemoveDisclaimerExtension_german = {
+          name: 'removeDisclaimer_german',
+          type: 'response',
+          match: ({ trace }) => {
+              // Ensure this extension is triggered only on the "removeDisclaimer" step
+              return trace.payload && trace.payload.name === 'removeDisclaimer_german';
+          },
+          render: ({ trace, element }) => {
+              // Check if the disclaimer has already been handled
+              if (trace.payload && trace.payload.shown) {
+                  console.log('Haftungsausschluss bereits geregelt.');
+                  return;
+              }
+
+              // Create the disclaimer container
+              const disclaimerContainer = document.createElement('div');
+              disclaimerContainer.style.display = 'flex';
+              disclaimerContainer.style.flexDirection = 'column';
+              disclaimerContainer.style.alignItems = 'center';
+              disclaimerContainer.style.margin = '10px 0';
+              disclaimerContainer.style.padding = '10px';
+              disclaimerContainer.style.backgroundColor = '#f9f9f9';
+              disclaimerContainer.style.borderRadius = '8px';
+              disclaimerContainer.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+              disclaimerContainer.style.textAlign = 'center';
+
+              // Add the disclaimer text
+              const disclaimerText = document.createElement('p');
+              disclaimerText.textContent =
+                  'Disclaimer: Bitte beachten Sie, dass alle Informationen und Empfehlungen zu spezifischen Plattformen und Tools auf unseren eigenen Erfahrungen basieren. Für die genauesten und aktuellsten Informationen empfehlen wir, die Plattformen direkt zu kontaktieren oder deren Websites zu besuchen. Bitte klicken Sie auf „Zustimmen“, um fortzufahren.';
+              disclaimerText.style.marginBottom = '10px';
+              disclaimerText.style.fontSize = '14px';
+              disclaimerText.style.color = '#333';
+
+              // Create the button for accepting the disclaimer
+              const agreeButton = document.createElement('button');
+              agreeButton.textContent = 'Zustimmen';
+              agreeButton.style.padding = '10px 20px';
+              agreeButton.style.border = 'none';
+              agreeButton.style.backgroundColor = '#4CAF50';
+              agreeButton.style.color = 'white';
+              agreeButton.style.borderRadius = '5px';
+              agreeButton.style.cursor = 'pointer';
+
+              // Attach click event to the button
+              agreeButton.addEventListener('click', () => {
+                  // Remove the disclaimer container
+                  disclaimerContainer.remove();
+
+                  // Trigger the Voiceflow bot to move to the next step
+                  window.voiceflow.chat.interact({
+                      type: 'text',
+                      payload: { message: 'Dem Haftungsausschluss zustimmen' },
+                  });
+
+                  console.log('Haftungsausschluss akzeptiert und der Bot ist weiter fortgeschritten.');
+              });
+
+              // Append the text and button to the container
+              disclaimerContainer.appendChild(disclaimerText);
+              disclaimerContainer.appendChild(agreeButton);
+
+              // Append the container to the chatbot UI
+              element.appendChild(disclaimerContainer);
+          },
+      };
+
+
+
+    </script>
+
+
    
     <script>
         const generateTableExtension = {
@@ -252,53 +328,7 @@ const pdfCreatorExtension = {
 
             const prefilledText = `Detailed Recommendation
 Solution Type:
-Based on your requirements to assist employees without direct interaction, automate repetitive tasks, make decisions and implement solutions, and generate human-like responses, answer questions using specific company knowledge, learn and update from custom knowledge sources, and summarize text or information, we recommend:
-
-Complex Agent: This is ideal for multi-LLM workflows, advanced decision-making tasks, or integration across tools and platforms. It will handle the complexity and specificity of your tasks effectively.
-
-Security Recommendation:
-Given your security expectation that data must be encrypted before sending to external servers, we recommend:
-
-On-Premise/Private Cloud: This will ensure that your data remains highly secure and within your control, adhering to strict data security standards.
-
-Tool Recommendation:
-Based on your needs and the required capabilities, we suggest the following tools:
-
-LangChain: Ideal for businesses requiring high customizability and in-house technical expertise. It supports complex workflows and extensive API integrations, making it suitable for your needs.
-
-Crewai: Offers flexible integration with some technical support available. It is highly customizable and scalable for complex applications, which aligns well with your requirements.
-
-LangFlow/Flowise: For quick deployment using low-code, drag-and-drop platforms. These tools will enable you to set up and deploy solutions rapidly, which is crucial given your timeline.
-
-Voiceflow/Dante: For intuitive conversational bots with minimal coding requirements. These tools are excellent for creating user-friendly interfaces and handling conversational tasks efficiently.
-
-n8n: For workflow automation with strong API support but minimal LLM dependency. It is versatile for building workflows and requires low coding skills for basic automation.
-
-Timeline-Based Recommendations:
-Given your expected timeline of 1 to 3 months, we recommend:
-
-Pre-Built Solutions or Low-Code Platforms: To ensure rapid deployment, tools like LangFlow, Flowise, Voiceflow, and Dante are ideal. They offer quick setup and deployment with minimal coding, ensuring you meet your timeline.
-
-Implementation Approach:
-Since you prefer the implementation to be handled entirely by someone else, we suggest:
-
-Full-Service Support: We will provide end-to-end implementation, including process analysis, tool selection, integration, QA, and optimization. This approach ensures that you get a comprehensive solution without needing to manage the technical details yourself.
-
-Service Transformation Approach:
-We offer a complete range of services to ensure successful chatbot implementation:
-
-Business Process Analysis: We will evaluate your business processes to identify areas where chatbots can create the most impact, highlight bottlenecks, and uncover opportunities for improvement.
-
-Identifying the Right Chatbot Tools: We will recommend the most suitable chatbot solution based on your specific needs, ensuring it fits seamlessly into your business ecosystem.
-
-Implementation and Integration: We will design chatbot workflows, integrate the chatbot with your existing systems, and ensure smooth deployment with minimal disruption.
-
-Quality Assurance (QA) Processes: We will establish testing protocols, conduct regular audits, and monitor performance to maintain high standards.
-
-Reporting and Continuous Optimization: We will analyze chatbot interactions, generate performance reports, and continuously refine workflows to keep your chatbot effective and aligned with your business objectives.
-
-Final Recommendation Summary:
-To meet your needs efficiently and securely within the given timeline, we recommend implementing a complex agent using tools like LangChain or Crewai for high customizability and integration capabilities. For rapid deployment, consider LangFlow, Flowise, Voiceflow, or Dante. We will handle the entire implementation process, ensuring a seamless and effective solution tailored to your business.
+igh customizability and integration capabilities. For rapid deployment, consider LangFlow, Flowise, Voiceflow, or Dante. We will handle the entire implementation process, ensuring a seamless and effective solution tailored to your business.
 
 Let us help you harness the power of chatbots to transform your business processes and achieve measurable results. Reach out to us today to get started!`;
 
@@ -472,6 +502,40 @@ Let us help you harness the power of chatbots to transform your business process
     };
     </script>
 
+
+<!-- Free Text Toggle Extension Script -->
+<script>
+  const freeTextToggleExtension_german = {
+    name: 'freeTextToggle_german',
+    type: 'response',
+    match: ({ trace }) =>
+      trace.payload && (trace.payload.name === 'remove_freetext_german' || trace.payload.name === 'add_freetext_german'),
+    render: ({ trace }) => {
+      function updateFreeTextInput(retries = 10) {
+        const vfWidgetContainers = document.querySelectorAll('*');
+        
+        for (let container of vfWidgetContainers) {
+          if (container.shadowRoot) {
+            const freeTextInput = container.shadowRoot.querySelector('textarea[id^="vf-chat-input"]');
+            if (freeTextInput) {
+              freeTextInput.placeholder = trace.payload.name === 'remove_freetext_german' ? 
+                "Bitte nutzen Sie die Buttons und aktualisieren Sie die Seite nicht." : "Message…";
+              freeTextInput.readOnly = trace.payload.name === 'remove_freetext_german';
+              return;
+            }
+          }
+        }
+
+        if (retries > 0) {
+          setTimeout(() => updateFreeTextInput(retries - 1), 500);
+        }
+      }
+
+      updateFreeTextInput();
+    },
+  };
+  </script>
+
 <script>
   // Custom Form Extension for custom_question1
   const CustomFormExtension1 = {
@@ -639,7 +703,502 @@ Let us help you harness the power of chatbots to transform your business process
     },
   };
 
-  function generateQuestions1() {
+  // Custom Form Extension for custom_question3
+const CustomFormExtension3 = {
+  name: 'CustomForm3',
+  type: 'response',
+  match: ({ trace }) => 
+    trace.type === 'custom_question3' || trace.payload.name === 'custom_question3', // Match custom step
+  render: ({ trace, element }) => {
+    const formContainer = document.createElement('form');
+
+    formContainer.innerHTML = `
+      <style>
+        form {
+          padding: 10px;
+          background-color: #f9f9f9;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          max-height: 500px;
+          width: 240px;
+          overflow-y: auto;
+        }
+        .question-block {
+          margin-bottom: 10px;
+          padding: 8px;
+          background-color: #ffffff;
+          border-radius: 4px;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        label {
+          font-size: 0.99em;
+          color: #333;
+          margin-bottom: 5px;
+          display: block;
+          font-weight: normal;
+        }
+        input[type="radio"], input[type="checkbox"] {
+          margin-right: 8px;
+        }
+        .submit {
+          background: linear-gradient(135deg, #2e6ee1, #2e7ff1);
+          border: none;
+          color: white;
+          padding: 10px;
+          font-size: 1em;
+          border-radius: 4px;
+          width: 100%;
+          cursor: pointer;
+          transition: background 0.3s;
+        }
+        .submit:hover {
+          background: linear-gradient(135deg, #2e7ff1, #2e6ee1);
+        }
+      </style>
+
+      ${generateQuestions3()}
+
+      <input type="submit" class="submit" value="Submit">
+    `;
+
+    formContainer.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(formContainer);
+      const responses = {};
+      formData.forEach((value, key) => {
+        if (responses[key]) {
+          responses[key] = [].concat(responses[key], value);
+        } else {
+          responses[key] = value;
+        }
+      });
+
+      formContainer.querySelector('.submit').remove();
+
+      window.voiceflow.chat.interact({
+        type: 'complete',
+        payload: { responses },
+      });
+    });
+
+    element.appendChild(formContainer);
+  },
+};
+
+// Custom Form Extension for custom_question4
+const CustomFormExtension4 = {
+  name: 'CustomForm4',
+  type: 'response',
+  match: ({ trace }) => 
+    trace.type === 'custom_question4' || trace.payload.name === 'custom_question4', // Match custom step
+  render: ({ trace, element }) => {
+    const formContainer = document.createElement('form');
+
+    formContainer.innerHTML = `
+      ${generateQuestions4()}
+
+      <input type="submit" class="submit" value="Submit">
+    `;
+
+    formContainer.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(formContainer);
+      const responses = {};
+      formData.forEach((value, key) => {
+        if (responses[key]) {
+          responses[key] = [].concat(responses[key], value);
+        } else {
+          responses[key] = value;
+        }
+      });
+
+      formContainer.querySelector('.submit').remove();
+
+      window.voiceflow.chat.interact({
+        type: 'complete',
+        payload: { responses },
+      });
+    });
+
+    element.appendChild(formContainer);
+  },
+};
+
+// Custom Form Extension for custom_question5
+const CustomFormExtension5 = {
+  name: 'CustomForm5',
+  type: 'response',
+  match: ({ trace }) => 
+    trace.type === 'custom_question5' || trace.payload.name === 'custom_question5', // Match custom step
+  render: ({ trace, element }) => {
+    const formContainer = document.createElement('form');
+
+    formContainer.innerHTML = `
+      ${generateQuestions5()}
+
+      <input type="submit" class="submit" value="Submit">
+    `;
+
+    formContainer.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(formContainer);
+      const responses = {};
+      formData.forEach((value, key) => {
+        if (responses[key]) {
+          responses[key] = [].concat(responses[key], value);
+        } else {
+          responses[key] = value;
+        }
+      });
+
+      formContainer.querySelector('.submit').remove();
+
+      window.voiceflow.chat.interact({
+        type: 'complete',
+        payload: { responses },
+      });
+    });
+
+    element.appendChild(formContainer);
+  },
+};
+
+
+// Custom Form Extension for custom_question1
+const CustomFormExtension1_german = {
+    name: 'CustomForm1_german',
+    type: 'response',
+    match: ({ trace }) => 
+      trace.type === 'custom_question1_german' || trace.payload.name === 'custom_question1_german', // Match custom step
+    render: ({ trace, element }) => {
+      const formContainer = document.createElement('form');
+
+      formContainer.innerHTML = `
+        <style>
+          form {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            width: 240px;
+            overflow-y: auto;
+          }
+          .question-block {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          }
+          label {
+            font-size: 0.99em;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+            font-weight: normal;
+          }
+          input[type="radio"], input[type="checkbox"] {
+            margin-right: 8px;
+          }
+          .submit {
+            background: linear-gradient(135deg, #2e6ee1, #2e7ff1);
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.3s;
+          }
+          .submit:hover {
+            background: linear-gradient(135deg, #2e7ff1, #2e6ee1);
+          }
+        </style>
+
+        ${generateQuestions1_german()}
+
+        <input type="submit" class="submit" value="Submit">
+      `;
+
+      formContainer.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(formContainer);
+        const responses = {};
+        formData.forEach((value, key) => {
+          if (responses[key]) {
+            responses[key] = [].concat(responses[key], value);
+          } else {
+            responses[key] = value;
+          }
+        });
+
+        formContainer.querySelector('.submit').remove();
+
+        window.voiceflow.chat.interact({
+          type: 'complete',
+          payload: { responses },
+        });
+      });
+
+      element.appendChild(formContainer);
+    },
+  };
+
+  // Custom Form Extension for custom_question2
+  const CustomFormExtension2_german = {
+    name: 'CustomForm2_german',
+    type: 'response',
+    match: ({ trace }) => 
+      trace.type === 'custom_question2_german' || trace.payload.name === 'custom_question2_german', // Match custom step
+    render: ({ trace, element }) => {
+      const formContainer = document.createElement('form');
+
+      formContainer.innerHTML = `
+        <style>
+          form {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            width: 240px;
+            overflow-y: auto;
+          }
+          .question-block {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          }
+          label {
+            font-size: 0.99em;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+            font-weight: normal;
+          }
+          input[type="radio"], input[type="checkbox"] {
+            margin-right: 8px;
+          }
+          .submit {
+            background: linear-gradient(135deg, #2e6ee1, #2e7ff1);
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.3s;
+          }
+          .submit:hover {
+            background: linear-gradient(135deg, #2e7ff1, #2e6ee1);
+          }
+        </style>
+
+        ${generateQuestions2_german()}
+
+        <input type="submit" class="submit" value="Submit">
+      `;
+
+      formContainer.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(formContainer);
+        const responses = {};
+        formData.forEach((value, key) => {
+          if (responses[key]) {
+            responses[key] = [].concat(responses[key], value);
+          } else {
+            responses[key] = value;
+          }
+        });
+
+        formContainer.querySelector('.submit').remove();
+
+        window.voiceflow.chat.interact({
+          type: 'complete',
+          payload: { responses },
+        });
+      });
+
+      element.appendChild(formContainer);
+    },
+  };
+
+  // Custom Form Extension for custom_question3
+const CustomFormExtension3_german = {
+  name: 'CustomForm3_german',
+  type: 'response',
+  match: ({ trace }) => 
+    trace.type === 'custom_question3_german' || trace.payload.name === 'custom_question3_german', // Match custom step
+  render: ({ trace, element }) => {
+    const formContainer = document.createElement('form');
+
+    formContainer.innerHTML = `
+      <style>
+        form {
+          padding: 10px;
+          background-color: #f9f9f9;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          max-height: 500px;
+          width: 240px;
+          overflow-y: auto;
+        }
+        .question-block {
+          margin-bottom: 10px;
+          padding: 8px;
+          background-color: #ffffff;
+          border-radius: 4px;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        label {
+          font-size: 0.99em;
+          color: #333;
+          margin-bottom: 5px;
+          display: block;
+          font-weight: normal;
+        }
+        input[type="radio"], input[type="checkbox"] {
+          margin-right: 8px;
+        }
+        .submit {
+          background: linear-gradient(135deg, #2e6ee1, #2e7ff1);
+          border: none;
+          color: white;
+          padding: 10px;
+          font-size: 1em;
+          border-radius: 4px;
+          width: 100%;
+          cursor: pointer;
+          transition: background 0.3s;
+        }
+        .submit:hover {
+          background: linear-gradient(135deg, #2e7ff1, #2e6ee1);
+        }
+      </style>
+
+      ${generateQuestions3_german()}
+
+      <input type="submit" class="submit" value="Submit">
+    `;
+
+    formContainer.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(formContainer);
+      const responses = {};
+      formData.forEach((value, key) => {
+        if (responses[key]) {
+          responses[key] = [].concat(responses[key], value);
+        } else {
+          responses[key] = value;
+        }
+      });
+
+      formContainer.querySelector('.submit').remove();
+
+      window.voiceflow.chat.interact({
+        type: 'complete',
+        payload: { responses },
+      });
+    });
+
+    element.appendChild(formContainer);
+  },
+};
+
+// Custom Form Extension for custom_question4
+const CustomFormExtension4_german = {
+  name: 'CustomForm4',
+  type: 'response',
+  match: ({ trace }) => 
+    trace.type === 'custom_question4_german' || trace.payload.name === 'custom_question4_german', // Match custom step
+  render: ({ trace, element }) => {
+    const formContainer = document.createElement('form');
+
+    formContainer.innerHTML = `
+      ${generateQuestions4_german()}
+
+      <input type="submit" class="submit" value="Submit">
+    `;
+
+    formContainer.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(formContainer);
+      const responses = {};
+      formData.forEach((value, key) => {
+        if (responses[key]) {
+          responses[key] = [].concat(responses[key], value);
+        } else {
+          responses[key] = value;
+        }
+      });
+
+      formContainer.querySelector('.submit').remove();
+
+      window.voiceflow.chat.interact({
+        type: 'complete',
+        payload: { responses },
+      });
+    });
+
+    element.appendChild(formContainer);
+  },
+};
+
+// Custom Form Extension for custom_question5
+const CustomFormExtension5_german = {
+  name: 'CustomForm5',
+  type: 'response',
+  match: ({ trace }) => 
+    trace.type === 'custom_question5_german' || trace.payload.name === 'custom_question5_german', // Match custom step
+  render: ({ trace, element }) => {
+    const formContainer = document.createElement('form');
+
+    formContainer.innerHTML = `
+      ${generateQuestions5_german()}
+
+      <input type="submit" class="submit" value="Submit">
+    `;
+
+    formContainer.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(formContainer);
+      const responses = {};
+      formData.forEach((value, key) => {
+        if (responses[key]) {
+          responses[key] = [].concat(responses[key], value);
+        } else {
+          responses[key] = value;
+        }
+      });
+
+      formContainer.querySelector('.submit').remove();
+
+      window.voiceflow.chat.interact({
+        type: 'complete',
+        payload: { responses },
+      });
+    });
+
+    element.appendChild(formContainer);
+  },
+};
+
+
+
+function generateQuestions1() {
     const questions = [
       { text: 'Select one or multiple options', name: 'goal', options: [
           'Communicate with end users', 
@@ -664,7 +1223,7 @@ Let us help you harness the power of chatbots to transform your business process
     `).join('');
   }
 
-  function generateQuestions2() {
+function generateQuestions2() {
     const questions = [
       { text: 'Select one or multiple options', name: 'capabilities', options: [
           'Understand human language', 
@@ -693,6 +1252,211 @@ Let us help you harness the power of chatbots to transform your business process
       </div>
     `).join('');
   }
+
+
+// Generate questions logic
+function generateQuestions3() {
+  const questions = [
+    { text: 'Select one option', name: 'security1', options: [
+        'My data is highly confidential and cannot leave my company’s servers under any circumstances.',
+        'Data must be encrypted before sending to external servers.',
+        'My data is public, so security requirements are low.',
+        'Not sure'] }
+  ];
+
+  return questions.map(q => `
+    <div class="question-block">
+      <label>${q.text}</label>
+      <div class="options">
+        ${q.options.map(option => `
+          <label>
+            <input type="radio" name="${q.name}" value="${option}">
+            ${option}
+          </label><br>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function generateQuestions4() {
+  const questions = [
+    { text: 'Select one option', name: 'timeline', options: [
+        '1 to 3 months',
+        'No specific deadline',
+        'Not sure'] }
+  ];
+
+  return questions.map(q => `
+    <div class="question-block">
+      <label>${q.text}</label>
+      <div class="options">
+        ${q.options.map(option => `
+          <label>
+            <input type="radio" name="${q.name}" value="${option}">
+            ${option}
+          </label><br>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function generateQuestions5() {
+  const questions = [
+    { text: 'Select one option', name: 'implementation', options: [
+        'I’d like to learn and implement it myself',
+        'I’d like the implementation to be handled entirely by someone else',
+        'I’d like to be guided through each step and implement it together with someone',
+        'Not sure'] }
+  ];
+
+  return questions.map(q => `
+    <div class="question-block">
+      <label>${q.text}</label>
+      <div class="options">
+        ${q.options.map(option => `
+          <label>
+            <input type="radio" name="${q.name}" value="${option}">
+            ${option}
+          </label><br>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+
+function generateQuestions1_german() {
+    const questions = [
+      { text: 'Wählen Sie eine oder mehrere Optionen aus', name: 'goal_german', options: [
+          'Mit Endbenutzern kommunizieren',
+          'Mitarbeiter ohne direkte Interaktion unterstützen',
+          'Wiederkehrende Aufgaben automatisieren',
+          'Entscheidungen treffen und Lösungen umsetzen',
+          'Nicht sicher',] }
+    ];
+
+    return questions.map(q => `
+      <div class="question-block">
+        <label>${q.text}</label>
+        <div class="options">
+          ${q.options.map(option => `
+            <label>
+              <input type="checkbox" name="${q.name}" value="${option}">
+              ${option}
+            </label><br>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+function generateQuestions2_german() {
+    const questions = [
+      { text: 'Wählen Sie eine oder mehrere Optionen aus', name: 'capabilities_german', options: [
+          'Menschliche Sprache verstehen', 
+          'Menschliche Antworten generieren', 
+          'Fragen mit spezifischem Unternehmenswissen beantworten', 
+          'Aus benutzerdefinierten Wissensquellen lernen und aktualisieren (strukturiert und unstrukturiert, z. B. Datenbanken, Tabellenkalkulationen, Chatverläufe)', 
+          'Texte oder Informationen zusammenfassen', 
+          'Lösungen oder Maßnahmen empfehlen', 
+          'Neue Inhalte generieren', 
+          'Aktionen initiieren (Bestellungen aufgeben, Termine planen, Zahlungen abwickeln, E-Mails senden etc.)', 
+          'Einfache, sich wiederholende Prozesse automatisieren, die kein fortgeschrittenes Denken und keine Entscheidungsfindung erfordern',
+          'Nicht sicher'] }
+    ];
+
+    return questions.map(q => `
+      <div class="question-block">
+        <label>${q.text}</label>
+        <div class="options">
+          ${q.options.map(option => `
+            <label>
+              <input type="checkbox" name="${q.name}" value="${option}">
+              ${option}
+            </label><br>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+
+// Generate questions logic
+function generateQuestions3_german() {
+  const questions = [
+    { text: 'Wählen Sie eine Option aus', name: 'security1_german', options: [
+        'Meine Daten sind hoch vertraulich und dürfen unter keinen Umständen die Server meines Unternehmens verlassen.',
+        'Daten müssen verschlüsselt werden, bevor sie an externe Server gesendet werden.',
+        'Meine Daten sind öffentlich, daher sind die Sicherheitsanforderungen gering.',
+        'Nicht sicher',] }
+  ];
+
+  return questions.map(q => `
+    <div class="question-block">
+      <label>${q.text}</label>
+      <div class="options">
+        ${q.options.map(option => `
+          <label>
+            <input type="radio" name="${q.name}" value="${option}">
+            ${option}
+          </label><br>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function generateQuestions4_german() {
+  const questions = [
+    { text: 'Wählen Sie eine Option aus', name: 'timeline_german', options: [
+        '1 bis 3 Monate',
+        'Keine spezifische Deadline',
+        'Nicht sicher'] }
+  ];
+
+  return questions.map(q => `
+    <div class="question-block">
+      <label>${q.text}</label>
+      <div class="options">
+        ${q.options.map(option => `
+          <label>
+            <input type="radio" name="${q.name}" value="${option}">
+            ${option}
+          </label><br>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function generateQuestions5_german() {
+  const questions = [
+    { text: 'Wählen Sie eine Option aus', name: 'implementation_german', options: [
+        'Ich möchte es selbst lernen und umsetzen',
+        'Ich möchte, dass die Implementierung vollständig von jemand anderem übernommen wird',
+        'Ich möchte Schritt für Schritt angeleitet werden und es gemeinsam mit jemandem umsetzen',
+        'Nicht sicher',] }
+  ];
+
+  return questions.map(q => `
+    <div class="question-block">
+      <label>${q.text}</label>
+      <div class="options">
+        ${q.options.map(option => `
+          <label>
+            <input type="radio" name="${q.name}" value="${option}">
+            ${option}
+          </label><br>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+
+
   </script>
 
 
@@ -703,14 +1467,18 @@ Let us help you harness the power of chatbots to transform your business process
           var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
           v.onload = function() {
             window.voiceflow.chat.load({
-              verify: { projectID: '675dd693768af851b6291fd6' },
+              verify: { projectID: '677fd6482df20e1eef8c0d9d' },
               url: 'https://general-runtime.voiceflow.com',
               versionID: 'production',
               allowDangerousHTML: true, /* Enable dangerous HTML elements */
               assistant: {
                 extensions: [
-                  pdfCreatorExtension, freeTextToggleExtension, 
-                  CustomFormExtension1, CustomFormExtension2, RemoveDisclaimerExtension, generateTableExtension
+                  pdfCreatorExtension, freeTextToggleExtension, CustomFormExtension1, 
+                  CustomFormExtension2, RemoveDisclaimerExtension, generateTableExtension, 
+                  CustomFormExtension3, CustomFormExtension4, CustomFormExtension5,
+                  freeTextToggleExtension_german, CustomFormExtension1_german, 
+                  CustomFormExtension2_german, RemoveDisclaimerExtension_german, 
+                  CustomFormExtension3_german, CustomFormExtension4_german, CustomFormExtension5_german
                 ],
                 stylesheet: 'test.css' // Reference your custom CSS file here               
               }
